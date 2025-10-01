@@ -148,6 +148,13 @@ binding.btnAdd.setOnClickListener(it -> {
 });
 ```
 
+### 삭제 콜백 인터페이스
+```java
+public interface OndeleteClickListener {
+    void deleteClick(int id);
+}
+```
+
 #### RecyclerView Adapter
 
 ```java
