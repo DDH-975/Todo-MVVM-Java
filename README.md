@@ -59,6 +59,6 @@ Room 데이터베이스를 활용하여 로컬에 데이터를 저장하며, Vie
 
   <br> <br> <br>
 ## 실행 화면 (Screenshots & GIFs)
-<img src="screenshot/recording.gif" width="250"/>
+<img src="screenshot/recording.gif" width="300"/>
    
 
