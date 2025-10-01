@@ -1,7 +1,7 @@
 # Todo-MVVM-Java
 
 ### 프로젝트 설명  
-이 프로젝트는 **MVVM 패턴 실습**에 초점을 맞춘 간단한 Java TodoList 앱입니다.  
+이 프로젝트는 **MVVM 패턴 실습**에 초점을 맞춘 간단한 TodoList 앱입니다.  
 Room 데이터베이스를 활용하여 로컬에 데이터를 저장하며, View ↔ ViewModel ↔ Model 간의 역할을 분리하는 것을 학습하는 목적을 가지고 있습니다.  
 
 ---
@@ -19,45 +19,188 @@ Room 데이터베이스를 활용하여 로컬에 데이터를 저장하며, Vie
 
 앱은 **Room DB → Repository → ViewModel → View** 흐름을 기반으로 동작합니다.  
 
-1. **Room DB (Model 계층)**  
-   - TodoEntity: DB에 저장될 데이터 구조 정의  
-   - TodoDao: 데이터 접근을 위한 인터페이스 (삽입, 삭제, 조회 등)  
+---
 
-2. **Repository**  
-   - DAO를 통해 실제 데이터베이스에 접근  
-   - 데이터 소스를 추상화하여 ViewModel이 DB 세부 구현을 알 필요 없도록 함  
+### 1. Room DB (Model 계층)
 
-3. **ViewModel**  
-   - Repository로부터 데이터를 받아 LiveData로 관리  
-   - View에서 발생하는 사용자 입력(추가, 삭제 요청)을 받아 Repository에 전달  
-   - UI 관련 로직을 관리하며 View와 Model을 연결  
+DB 접근을 위한 `Dao` 인터페이스를 정의합니다.  
+LiveData를 반환하여 데이터 변경 시 자동으로 UI에 반영되도록 합니다.  
 
-4. **View (Activity & XML)**  
-   - 사용자 입력 처리 (예: Todo 추가 버튼 클릭)  
-   - ViewModel의 LiveData를 관찰(Observe)하여 UI 자동 업데이트  
+```java
+@Dao
+public interface TodoDao {
+    @Query("SELECT * FROM TODOENTITY")
+    LiveData<List<TodoEntity>> getAllData();
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    void setInsertTodo(TodoEntity todo);
+
+    @Query("DELETE FROM TodoEntity")
+    void deleteAllTodo();
+
+    @Query("DELETE FROM TodoEntity WHERE id = :id")
+    void deleteDataWhereId(int id);
+}
+````
 
 ---
 
-### 📌 데이터 흐름 예시  
+### 2. Repository
 
-- 사용자가 **Todo 입력 후 추가 버튼 클릭**  
-  → View가 ViewModel의 `insertTodo()` 호출  
-  → ViewModel은 Repository를 통해 Room DB에 삽입 요청  
-  → Room DB 변경 감지 → Repository → ViewModel의 LiveData 업데이트  
-  → View는 LiveData를 구독하고 있으므로 UI 자동 반영  
+Repository는 DB 접근 로직을 캡슐화하여 ViewModel이 데이터 소스를 직접 알지 않아도 되도록 합니다.
+비동기 처리를 위해 `Executor`를 사용합니다.
 
+```java
+public class TodoRepository {
+    private TodoDao dao;
+    private LiveData<List<TodoEntity>> allData;
+    private Executor executor = Executors.newSingleThreadExecutor();
+
+    public TodoRepository(Application application) {
+        TodoDB db = TodoDB.getDatabase(application);
+        dao = db.dao();
+        allData = dao.getAllData();
+    }
+
+    public LiveData<List<TodoEntity>> getAllData() {
+        return allData;
+    }
+
+    public void InsertData(TodoEntity todoEntity) {
+        executor.execute(() -> dao.setInsertTodo(todoEntity));
+    }
+
+    public void deleteAllData() {
+        executor.execute(() -> dao.deleteAllTodo());
+    }
+
+    public void deleteDataWhereId(int id) {
+        executor.execute(() -> dao.deleteDataWhereId(id));
+    }
+}
+```
 
 ---
 
-## 📱 주요 기능  
-- Todo 추가  
-- Todo 삭제  
-- Room DB에 데이터 영구 저장  
-- LiveData를 통한 실시간 UI 반영
+### 3. ViewModel
+
+ViewModel은 Repository를 통해 데이터를 가져오고, `LiveData`로 관리하여 View에 전달합니다.
+UI 관련 로직과 데이터 보존 역할을 담당합니다.
+
+```java
+public class Todo_ViewModel extends AndroidViewModel {
+    private TodoRepository repository;
+    private LiveData<List<TodoEntity>> liveData;
+
+    public Todo_ViewModel(@NonNull Application application) {
+        super(application);
+        repository = new TodoRepository(application);
+        liveData = repository.getAllData();
+    }
+
+    public LiveData<List<TodoEntity>> getAllData() {
+        return liveData;
+    }
+
+    public void insertData(TodoEntity data) {
+        repository.InsertData(data);
+    }
+
+    public void deleteAllData() {
+        repository.deleteAllData();
+    }
+
+    public void deleteDataWhereId(int id) {
+        repository.deleteDataWhereId(id);
+    }
+}
+```
 
 ---
 
-  <br> <br> <br>
+### 4. View (MainActivity & Adapter)
+
+View는 **사용자 입력을 처리**하고, ViewModel의 `LiveData`를 **관찰(Observer)** 하여 자동으로 UI를 업데이트합니다.
+
+#### LiveData 관찰 (자동 업데이트)
+
+```java
+viewModel.getAllData().observe(this, todoData -> {
+    adapter.setData(todoData);
+    adapter.notifyDataSetChanged();
+});
+```
+
+➡️ LiveData 값이 변경될 때마다 RecyclerView UI가 자동 갱신됩니다.
+
+#### 사용자 입력 처리
+
+```java
+binding.btnAdd.setOnClickListener(it -> {
+    String todoList = binding.etTodo.getText().toString().trim();
+    if (todoList.isEmpty()) {
+        Toast.makeText(this, "할일을 입력해주세요", Toast.LENGTH_SHORT).show();
+    } else {
+        TodoEntity data = new TodoEntity();
+        data.setTodo(todoList);
+        viewModel.insertData(data);
+    }
+});
+```
+
+#### RecyclerView Adapter
+
+```java
+@Override
+public void onBindViewHolder(@NonNull Todo_Adpater.Viewholder holder, int position) {
+    holder.todo.setText(data.get(position).getTodo());
+    holder.delete.setOnClickListener(it -> {
+        listener.deleteClick(data.get(position).getId());
+    });
+}
+```
+
+➡️ 삭제 버튼 클릭 → Adapter 콜백 실행 → ViewModel의 `deleteDataWhereId()` 호출 → Repository → Room DB 삭제 → LiveData 변경 → UI 자동 반영
+
+---
+
+## 📌 전체 데이터 흐름 요약
+
+1. **사용자 입력 (추가/삭제)** → `MainActivity` → `ViewModel` 호출
+2. **ViewModel** → `Repository` 통해 DB 요청 위임
+3. **Repository** → `Room DB` 접근 (비동기 처리)
+4. **DB 변경** → `LiveData` 업데이트 → `ViewModel` → `View` 자동 반영
+
+---
+
+## 📱 주요 기능
+
+* Todo 추가
+* Todo 삭제
+* Room DB를 통한 데이터 영구 저장
+* LiveData & Observer를 통한 **실시간 UI 업데이트**
+
+---
+
+## 📊 구조 다이어그램 (Markdown)
+
+```text
+사용자 입력
+    ↓
+   View (MainActivity / Adapter)
+    ↓
+ ViewModel (Todo_ViewModel)
+    ↓
+ Repository (TodoRepository)
+    ↓
+ Room DB (TodoDao, TodoEntity)
+    ↓
+ LiveData 업데이트
+    ↓
+ View 자동 반영 (Observer)
+```
+---
+
 ## 실행 화면 (Screenshots & GIFs)
 <img src="screenshot/recording.gif" width="250"/>
    
