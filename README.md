@@ -53,4 +53,12 @@ Room 데이터베이스를 활용하여 로컬에 데이터를 저장하며, Vie
 - Todo 추가  
 - Todo 삭제  
 - Room DB에 데이터 영구 저장  
-- LiveData를 통한 실시간 UI 반영  
+- LiveData를 통한 실시간 UI 반영
+
+---
+
+  <br> <br> <br>
+## 실행 화면 (Screenshots & GIFs)
+<img src="screenshot/recording.gif" width="250"/>
+   
+
