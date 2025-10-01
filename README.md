@@ -45,7 +45,7 @@ public interface TodoDao {
 
 ---
 
-### 2. Repository
+### 2. [Repository](app/src/main/java/com/project/todolistjava/TodoRoom/TodoRepository.java)
 
 Repository는 DB 접근 로직을 캡슐화하여 ViewModel이 데이터 소스를 직접 알지 않아도 되도록 합니다.
 비동기 처리를 위해 `Executor`를 사용합니다.
@@ -82,7 +82,7 @@ public class TodoRepository {
 
 ---
 
-### 3. ViewModel
+### 3. [ViewModel](app/src/main/java/com/project/todolistjava/Todo_ViewModel.java)
 
 ViewModel은 Repository를 통해 데이터를 가져오고, `LiveData`로 관리하여 View에 전달합니다.
 UI 관련 로직과 데이터 보존 역할을 담당합니다.
@@ -118,7 +118,7 @@ public class Todo_ViewModel extends AndroidViewModel {
 
 ---
 
-### 4. View (MainActivity & Adapter)
+### 4. View ([MainActivity](app/src/main/java/com/project/todolistjava/MainActivity.java) & [Adapter](app/src/main/java/com/project/todolistjava/todoRecycler/Todo_Adpater.java))
 
 View는 **사용자 입력을 처리**하고, ViewModel의 `LiveData`를 **관찰(Observer)** 하여 자동으로 UI를 업데이트합니다.
 
@@ -204,6 +204,5 @@ public void onBindViewHolder(@NonNull Todo_Adpater.Viewholder holder, int positi
 ## 실행 화면 (Screenshots & GIFs)
 <img src="screenshot/recording.gif" width="250"/>
 
-[MainActivity](app/src/main/java/com/project/todolistjava/MainActivity.java)
    
 
