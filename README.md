@@ -203,5 +203,7 @@ public void onBindViewHolder(@NonNull Todo_Adpater.Viewholder holder, int positi
 
 ## 실행 화면 (Screenshots & GIFs)
 <img src="screenshot/recording.gif" width="250"/>
+
+[MainActivity](app/src/main/java/com/project/todolistjava/MainActivity.java)
    
 
