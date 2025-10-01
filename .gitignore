@@ -1,0 +1,41 @@
+# Built application files
+*.apk
+*.aab
+*.ap_
+*.dex
+*.class
+
+# Generated files
+bin/
+gen/
+out/
+build/
+*/build/
+
+# Gradle files
+.gradle/
+*/.gradle/
+
+# Local configuration file (SDK path, etc.)
+local.properties
+
+# Android Studio and IntelliJ IDEA files
+.idea/
+*.iml
+*.iws
+*.ipr
+.navigation/
+captures/
+output.json
+
+# Keystore files (If you don't want to check in your signing key)
+# keystore 파일은 보안상 민감하므로 보통 커밋하지 않습니다.
+*.jks
+*.keystore
+
+# Log files
+*.log
+
+# OS-specific files
+.DS_Store # macOS
+Thumbs.db # Windows
