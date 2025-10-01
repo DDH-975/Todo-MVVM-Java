@@ -189,7 +189,7 @@ public void onBindViewHolder(@NonNull Todo_Adpater.Viewholder holder, int positi
 
 ---
 
-## 📊 구조 다이어그램 (Markdown)
+## 📊 구조 다이어그램
 
 ```text
 사용자 입력
