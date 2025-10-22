@@ -14,7 +14,7 @@
         android:layout_height="match_parent"
         android:padding="16dp">
 
-        <!-- 상단 타이틀 -->
+
         <TextView
             android:id="@+id/tvTitle"
             android:layout_width="wrap_content"
@@ -27,7 +27,7 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
-        <!-- RecyclerView -->
+
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/recyclerView"
             android:layout_width="0dp"
@@ -37,7 +37,7 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent" />
 
-        <!-- 입력창 + 버튼 (하단 고정) -->
+
         <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/inputLayout"
             android:layout_width="0dp"
