@@ -115,14 +115,32 @@ public class Todo_ViewModel extends AndroidViewModel {
     }
 }
 ```
+💡 ViewModel이 아닌 AndroidViewModel을 상속한 이유
+- TodoRepository에서 Room Database를 초기화할 때 Application Context가 필요하기 때문입니다.
+- 일반 ViewModel은 Context에 접근할 수 없지만, AndroidViewModel은 생성자를 통해 Application 객체를 전달받을 수 있습니다.
+- 이를 통해 ViewModel 내부에서 getApplication()을 사용하여 안전하게 Room DB, SharedPreferences 등 Context 기반 리소스를 초기화할 수 있습니다.
+  
+즉, View와 분리된 상태 관리 역할을 유지하면서도, 앱 전역 자원에 접근할 수 있도록 하기 위해 AndroidViewModel을 사용하였습니다.
 
 ---
 
 ### 4. View ([MainActivity](app/src/main/java/com/project/todolistjava/MainActivity.java) & [Adapter](app/src/main/java/com/project/todolistjava/todoRecycler/Todo_Adpater.java))
 
-View는 **사용자 입력을 처리**하고, ViewModel의 `LiveData`를 **관찰(Observer)** 하여 자동으로 UI를 업데이트합니다.
+#### ViewModel 초기화 (MainActivity)
+
+`MainActivity`에서는 `ViewModelProvider.AndroidViewModelFactory`를 사용해 `Todo_ViewModel` 인스턴스를 생성합니다.
+이는 `Todo_ViewModel`이 `AndroidViewModel`을 상속받아 `Application` 객체를 필요로 하기 때문입니다.
+
+```java
+viewModel = new ViewModelProvider( this,ViewModelProvider.AndroidViewModelFactory.getInstance(getApplication()))
+.get(Todo_ViewModel.class);
+```
+`AndroidViewModelFactory`는 내부적으로 `getApplication()`을 전달해 `Todo_ViewModel`의 생성자를 올바르게 호출합니다.
+
+<br>
 
 #### LiveData 관찰 (자동 업데이트)
+View는 **사용자 입력을 처리**하고, ViewModel의 `LiveData`를 **관찰(Observer)** 하여 자동으로 UI를 업데이트합니다.
 
 ```java
 viewModel.getAllData().observe(this, todoData -> {
@@ -132,6 +150,8 @@ viewModel.getAllData().observe(this, todoData -> {
 ```
 
 ➡️ LiveData 값이 변경될 때마다 RecyclerView UI가 자동 갱신됩니다.
+
+<br>
 
 #### 사용자 입력 처리
 
@@ -147,6 +167,7 @@ binding.btnAdd.setOnClickListener(it -> {
     }
 });
 ```
+<br>
 
 ### 삭제 콜백 인터페이스
 ```java
