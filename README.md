@@ -118,7 +118,7 @@ public class Todo_ViewModel extends AndroidViewModel {
 💡 ViewModel이 아닌 AndroidViewModel을 상속한 이유
 - TodoRepository에서 Room Database를 초기화할 때 Application Context가 필요하기 때문입니다.
 - 일반 ViewModel은 Context에 접근할 수 없지만, AndroidViewModel은 생성자를 통해 Application 객체를 전달받을 수 있습니다.
-- 이를 통해 ViewModel 내부에서 getApplication()을 사용하여 안전하게 Room DB, SharedPreferences 등 Context 기반 리소스를 초기화할 수 있습니다.
+- 이를 통해 ViewModel 내부에서 getApplication()을 사용하여 안전하게 Room DB등 Context 기반 리소스를 초기화할 수 있습니다.
   
 즉, View와 분리된 상태 관리 역할을 유지하면서도, 앱 전역 자원에 접근할 수 있도록 하기 위해 AndroidViewModel을 사용하였습니다.
 
