@@ -128,7 +128,7 @@ public class Todo_ViewModel extends AndroidViewModel {
 
 #### ViewModel 초기화 (MainActivity)
 
-`MainActivity`에서는 `ViewModelProvider.AndroidViewModelFactory`를 사용해 `Todo_ViewModel` 인스턴스를 생성합니다.
+`MainActivity`에서는 `ViewModelProvider.AndroidViewModelFactory`를 사용해 `Todo_ViewModel` 인스턴스를 생성합니다. <br>
 이는 `Todo_ViewModel`이 `AndroidViewModel`을 상속받아 `Application` 객체를 필요로 하기 때문입니다.
 
 ```java
