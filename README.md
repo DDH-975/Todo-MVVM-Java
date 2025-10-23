@@ -132,8 +132,8 @@ public class Todo_ViewModel extends AndroidViewModel {
 이는 `Todo_ViewModel`이 `AndroidViewModel`을 상속받아 `Application` 객체를 필요로 하기 때문입니다.
 
 ```java
-viewModel = new ViewModelProvider( this,ViewModelProvider.AndroidViewModelFactory.getInstance(getApplication()))
-.get(Todo_ViewModel.class);
+viewModel = new ViewModelProvider( this,ViewModelProvider.AndroidViewModelFactory
+.getInstance(getApplication())).get(Todo_ViewModel.class);
 ```
 `AndroidViewModelFactory`는 내부적으로 `getApplication()`을 전달해 `Todo_ViewModel`의 생성자를 올바르게 호출합니다.
 
